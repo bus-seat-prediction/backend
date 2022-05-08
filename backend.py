@@ -4,6 +4,7 @@ from tensorflow import keras
 import numpy as np
 import pandas as pd
 
+
 #플라스크 설정
 app = Flask(__name__)
 CORS(app, resources={r'*': {'origins': '*'}})
@@ -69,7 +70,6 @@ def get_busseat_prediction(busnum,date,time):
     result = reverse_min_max_scaling(raw_df[scale_cols], pred)
     int_pred = np.asarray(result, dtype = int)
 
-    print(int_pred[5][5])
     # 정류장 json 데이터랑 연동하기
     # with open('station_dict.json') as f:
     #     station_dict = json.load(f)
