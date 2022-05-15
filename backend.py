@@ -69,7 +69,8 @@ def get_busseat_prediction(busnum,date,time):
 
     result = reverse_min_max_scaling(raw_df[scale_cols], pred)
     int_pred = np.asarray(result, dtype = int)
-
+    int_pred=list(int_pred[5])
+    print(int_pred)
     # 정류장 json 데이터랑 연동하기
     # with open('station_dict.json') as f:
     #     station_dict = json.load(f)
@@ -80,7 +81,7 @@ def get_busseat_prediction(busnum,date,time):
     output = {
         'busnum':busnum,
         'stations':scale_cols,
-        'int_pred':str(int_pred[5][5]),
+        'prediction':int_pred,
         'date':date,
         'time':time
         }
