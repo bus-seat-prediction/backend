@@ -12,8 +12,9 @@ CORS(app, resources={r'*': {'origins': '*'}})
 def reverse_min_max_scaling(org_x, x): #종가 예측값
     org_x_np = np.asarray(org_x) 
     x_np = np.asarray(x)
-    return (x_np * (55 - 0 + 1e-7)) + org_x_np.min()
-#     return (x_np * (org_x_np.max() - org_x_np.min() + 1e-7)) + org_x_np.min()
+    return (x_np * (org_x_np.max() - org_x_np.min() + 1e-7)) + org_x_np.min()
+    # return (x_np * (55 - 0 + 1e-7)) + org_x_np.min()
+
 
 def make_sequene_dataset(feature, label, window_size):
 
