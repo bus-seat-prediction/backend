@@ -35,6 +35,9 @@ def min_max_scaling(x):
 @app.route("/prediction/<busnum>/<date>/<time>", methods=["GET"])
 def get_busseat_prediction(busnum,date,time):
 
+    # 테스트 url
+    # http://localhost/prediction/7612/20220420/15
+
     # 버스 모델 불러오기
     model = keras.models.load_model('./models/20220305_20220415_{}.h5'.format(busnum))
 
@@ -93,6 +96,15 @@ def get_busseat_prediction(busnum,date,time):
             int_pred[i]=int(int_pred[i])
 
     # 혼잡도 추가해야함
+    complexity=[]
+    for i in range(len(int_pred)):
+        if(int_pred[i]>=35):
+            complexity.append(3)
+        elif(20<=int_pred[i] and int_pred[i]<35):
+            complexity.append(2)
+        else:
+            complexity.append(1)
+
     # 지금은 1주인데 적어도 1달까지는 예측시켜줘야함!
 
     # 데이터 리턴하기 
@@ -100,6 +112,7 @@ def get_busseat_prediction(busnum,date,time):
         'busnum':str(busnum),
         'stations':scale_cols,
         'prediction':int_pred,
+        'complexity':complexity,
         'date':str(date),
         'time':str(time)
         }
