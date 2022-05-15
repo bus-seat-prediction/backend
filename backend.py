@@ -3,7 +3,7 @@ from flask_cors import CORS,cross_origin
 from tensorflow import keras
 import numpy as np
 import pandas as pd
-
+import datetime as dt
 
 #플라스크 설정
 app = Flask(__name__)
@@ -65,26 +65,43 @@ def get_busseat_prediction(busnum,date,time):
 
     x_test = X[split:]
 
-    # 예측 데이터에서 결과값 찾기
+    #예측하기
     pred = model.predict(x_test)
 
     result = reverse_min_max_scaling(raw_df[scale_cols], pred)
     int_pred = np.asarray(result, dtype = int)
-    int_pred=list(int_pred[5])
-    print(int_pred)
-    # 정류장 json 데이터랑 연동하기
-    # with open('station_dict.json') as f:
-    #     station_dict = json.load(f)
 
-    # stations = station_dict[busnum]
+
+    # 예측 데이터에서 결과값 찾기
+    prsent_time=dt.datetime(2022,4,16,3,0,0)
+
+    predict_year = date[0:4]
+    predict_month = date[4:6]
+    predict_day = date[6:8]
+    predict_time = time
+    predict_time=dt.datetime(int(predict_year),int(predict_month),int(predict_day),int(predict_time),0,0)
+
+    result_hour = int(((predict_time-prsent_time).total_seconds())/60/60)
+
+    #결과값 리스트 변환
+    int_pred=list(int_pred[result_hour])
+
+    for i in range(len(int_pred)):
+        if(int_pred[i]<=0):
+            int_pred[i]=0
+        else:
+            int_pred[i]=int(int_pred[i])
+
+    # 혼잡도 추가해야함
+    # 지금은 1주인데 적어도 1달까지는 예측시켜줘야함!
 
     # 데이터 리턴하기 
     output = {
-        'busnum':busnum,
+        'busnum':str(busnum),
         'stations':scale_cols,
         'prediction':int_pred,
-        'date':date,
-        'time':time
+        'date':str(date),
+        'time':str(time)
         }
     return jsonify({'result' : output})
 
