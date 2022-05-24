@@ -38,7 +38,16 @@ def min_max_scaling(x):
 @app.route("/prediction/<busnum>/<date>/<time>", methods=["GET"])
 def get_busseat_prediction(busnum,date,time):
 
-    date=date[0:4]+date[5:7]+date[8:10]
+    std_date = dt.date(2022,4,15)
+    input_date = dt.date(int(date[0:4]),int(date[5:7]),int(date[8:10]))
+    diff_date = input_date - std_date
+
+    rest_date = int(diff_date.days%14)
+    std_date = std_date + dt.timedelta(days=rest_date)
+
+    date=std_date
+
+    date=date.strftime("%Y")+date.strftime("%m")+date.strftime("%d")
 
     # 버스 모델 불러오기
     model = keras.models.load_model('./models/20220305_20220415_{}.h5'.format(busnum))
@@ -63,7 +72,7 @@ def get_busseat_prediction(busnum,date,time):
     feature_np = feature_df.to_numpy()
     label_np = label_df.to_numpy()
 
-    split = -168
+    split = -336
     window_size = 168
 
     X, Y = make_sequene_dataset(feature_np, label_np, window_size)
@@ -78,7 +87,7 @@ def get_busseat_prediction(busnum,date,time):
 
 
     # 예측 데이터에서 결과값 찾기
-    prsent_time=dt.datetime(2022,4,16,3,0,0)
+    presenttime=dt.datetime(2022,4,16,3,0,0)
 
     predict_year = date[0:4]
     predict_month = date[4:6]
@@ -86,7 +95,7 @@ def get_busseat_prediction(busnum,date,time):
     predict_time = time
     predict_time=dt.datetime(int(predict_year),int(predict_month),int(predict_day),int(predict_time),0,0)
 
-    result_hour = int(((predict_time-prsent_time).total_seconds())/60/60)
+    result_hour = int(((predict_time-presenttime).total_seconds())/60/60)
 
     #결과값 리스트 변환
     int_pred=list(int_pred[result_hour])
