@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 
+# 테스트 url
+# http://localhost/prediction/7612/20220420/15
+
 #플라스크 설정
 app = Flask(__name__)
 CORS(app, resources={r'*': {'origins': '*'}})
@@ -35,8 +38,7 @@ def min_max_scaling(x):
 @app.route("/prediction/<busnum>/<date>/<time>", methods=["GET"])
 def get_busseat_prediction(busnum,date,time):
 
-    # 테스트 url
-    # http://localhost/prediction/7612/20220420/15
+    date=date[0:4]+date[5:7]+date[8:10]
 
     # 버스 모델 불러오기
     model = keras.models.load_model('./models/20220305_20220415_{}.h5'.format(busnum))
@@ -107,18 +109,22 @@ def get_busseat_prediction(busnum,date,time):
 
     # 지금은 1주인데 적어도 1달까지는 예측시켜줘야함!
 
+    station_info_data=[]
+
+    for i in range(len(scale_cols)):
+        tmp_dict={}
+        tmp_dict['station']=scale_cols[i]
+        tmp_dict['int_pred']=int_pred[i]
+        tmp_dict['complexity']=complexity[i]
+        station_info_data.append(tmp_dict)
     # 데이터 리턴하기 
     output = {
         'busnum':str(busnum),
-        'stations':scale_cols,
-        'prediction':int_pred,
-        'complexity':complexity,
+        'station_info_data':station_info_data,
         'date':str(date),
         'time':str(time)
         }
     return jsonify({'result' : output})
-
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=80)
