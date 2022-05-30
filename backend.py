@@ -42,6 +42,7 @@ def get_busseat_prediction(busnum,date,time):
     input_date = dt.date(int(date[0:4]),int(date[5:7]),int(date[8:10]))
     diff_date = input_date - std_date
 
+    time=time[0:2]
     rest_date = int(diff_date.days%14)
     std_date = std_date + dt.timedelta(days=rest_date)
 
